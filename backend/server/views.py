@@ -2,7 +2,7 @@ from django.db.models import Count
 from rest_framework import viewsets
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAuthenticated
 from .models import Server
 from .schema import server_list_docs
 from .serializer import ServerSerializer
@@ -13,9 +13,10 @@ class ServerListViewSet(viewsets.ViewSet):
     ViewSet for listing Servers.
     Attributes: queryset (QuerySet): QuerySet list of all Server objects.
     """
-
+    
     queryset = Server.objects.all()
-
+    permission_classes = [IsAuthenticated]
+    
     @server_list_docs
     def list(self, request):
         """
@@ -39,26 +40,24 @@ class ServerListViewSet(viewsets.ViewSet):
         by_user = request.query_params.get("by_user") == "true"
         by_server_id = request.query_params.get("by_server_id")
         with_num_members = request.query_params.get("with_num_members") == "true"
-
+        
         if category:
             self.queryset = self.queryset.filter(category__name=category)
-
+        
         if by_user:
             if by_user and request.user.is_authenticated:
                 user_id = request.user.id
                 self.queryset = self.queryset.filter(member=user_id)
             else:
                 raise AuthenticationFailed()
-
+        
         if with_num_members:
             self.queryset = self.queryset.annotate(num_members=Count("member"))
-            for channel in self.queryset:
-                print(channel.num_members)
-
+        
         if by_server_id:
             if not request.user.is_authenticated:
                 raise AuthenticationFailed()
-
+            
             try:
                 self.queryset = self.queryset.filter(id=by_server_id)
                 if not self.queryset.exists():
@@ -67,10 +66,10 @@ class ServerListViewSet(viewsets.ViewSet):
                     )
             except ValueError as exc:
                 raise ValidationError(detail="Server value error") from exc
-
+        
         if qty:
             self.queryset = self.queryset[: int(qty)]
-
+        
         serializer = ServerSerializer(
             self.queryset,
             many=True,
