@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from .models import Channel, Server
+from .models import Category, Channel, Server
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
 
 
 class ChannelSerializer(serializers.ModelSerializer):
@@ -8,10 +14,10 @@ class ChannelSerializer(serializers.ModelSerializer):
     Serializer for Channels.
     This serializer is used to serialize and deserialize Channel objects.
     """
-
+    
     class Meta:
         """Class Meta to get all fields"""
-
+        
         model = Channel
         fields = "__all__"
 
@@ -21,16 +27,17 @@ class ServerSerializer(serializers.ModelSerializer):
     Serializer for Servers.
     This serializer is used to serialize and deserialize Server objects.
     """
-
+    
     num_members = serializers.SerializerMethodField()
     channel_server = ChannelSerializer(many=True)
-
+    category = serializers.StringRelatedField()
+    
     class Meta:
         """Class Meta to exclude member field"""
-
+        
         model = Server
         exclude = ("member",)
-
+    
     def get_num_members(self, obj):
         """
         Get the number of members in the Server.
@@ -40,7 +47,7 @@ class ServerSerializer(serializers.ModelSerializer):
         if hasattr(obj, "num_members"):
             return obj.num_members
         return None
-
+    
     def to_representation(self, instance):
         """
         Serialize the instance to a Python dictionary.
