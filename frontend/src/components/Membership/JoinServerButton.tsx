@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const JoinServerButton = () => {
   const { serverId } = useParams();
   const navigate = useNavigate();
-  const { joinServer, leaveServer, isLoading, error, isUserMember } =
+  const { joinServer, leaveServer, isLoading, isUserMember } =
     useMembershipContext();
 
   const handleJoinServer = async () => {

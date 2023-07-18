@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import useMembership from "../services/membershipService";
+import useMembership from "../services/MembershipService";
 
 interface IuseServer {
   joinServer: (serverId: number) => Promise<void>;

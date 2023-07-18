@@ -12,8 +12,9 @@ import {
 import MessageInterfaceChannels from "./MessageInterfaceChannels";
 import Scroll from "./Scroll";
 import { useParams } from "react-router-dom";
-import { Server } from "../../@types/server.d";
+import { Server } from "../../@types/server";
 import useChatWebSocket from "../../services/ChatService";
+import React from "react";
 
 interface SendMessageData {
   type: string;
@@ -32,17 +33,14 @@ interface Message {
   timestamp: string;
 }
 
-const messageInterface = (props: ServerChannelProps) => {
+const MessageInterface = (props: ServerChannelProps) => {
   const { data } = props;
   const theme = useTheme();
-
   const { serverId, channelId } = useParams();
-
   const { newMessage, message, setMessage, sendJsonMessage } = useChatWebSocket(
     channelId || "",
     serverId || "",
   );
-
   const server_name = data?.[0]?.name ?? "Server";
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -208,4 +206,4 @@ const messageInterface = (props: ServerChannelProps) => {
     </>
   );
 };
-export default messageInterface;
+export default MessageInterface;

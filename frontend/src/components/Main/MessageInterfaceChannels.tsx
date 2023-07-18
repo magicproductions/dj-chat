@@ -11,10 +11,10 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { MEDIA_URL } from "../../config";
-import { Server } from "../../@types/server.d";
+import { Server } from "../../@types/server";
 import { useParams } from "react-router-dom";
 import ServerChannels from "../SecondaryDraw/ServerChannels";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import JoinServerButton from "../Membership/JoinServerButton";
 

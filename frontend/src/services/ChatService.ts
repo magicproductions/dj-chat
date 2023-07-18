@@ -1,6 +1,6 @@
 import useWebSocket from "react-use-websocket";
 import { useState } from "react";
-import { useAuthService } from "../services/AuthServices";
+import { useAuthService } from "./AuthServices.tsx";
 import useCrud from "../hooks/useCrud";
 import { WS_ROOT } from "../config";
 import { Server } from "../@types/server";

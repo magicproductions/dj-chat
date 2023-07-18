@@ -7,7 +7,7 @@ import MessageInterface from "../components/Main/MessageInterface";
 import ServerChannels from "../components/SecondaryDraw/ServerChannels";
 import UserServers from "../components/PrimaryDraw/UserServers";
 import { useParams, useNavigate } from "react-router-dom";
-import { Server } from "../@types/server.d";
+import { Server } from "../@types/server";
 import useCrud from "../hooks/useCrud";
 import { useEffect } from "react";
 

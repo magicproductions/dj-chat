@@ -1,6 +1,8 @@
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +10,46 @@ from rest_framework.response import Response
 from .models import Category, Server
 from .schema import server_list_docs
 from .serializer import CategorySerializer, ServerSerializer
+
+
+class ServerMembershipViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def create(self, request, server_id):
+        server = get_object_or_404(Server, id=server_id)
+        
+        user = request.user
+        
+        if server.member.filter(id=user.id).exists():
+            return Response({"error": "User is already a member"}, status=status.HTTP_409_CONFLICT)
+        
+        server.member.add(user)
+        
+        return Response({"message": "User joined server successfully"}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["DELETE"])
+    def remove_member(self, request, server_id):
+        server = get_object_or_404(Server, id=server_id)
+        user = request.user
+        
+        if not server.member.filter(id=user.id).exists():
+            return Response({"error": "User is not a member"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if server.owner == user:
+            return Response({"error": "Owners cannot be removed as a member"}, status=status.HTTP_409_CONFLICT)
+        
+        server.member.remove(user)
+        
+        return Response({"message": "User removed from server..."}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["GET"])
+    def is_member(self, request, server_id=None):
+        server = get_object_or_404(Server, id=server_id)
+        user = request.user
+        
+        is_member = server.member.filter(id=user.id).exists()
+        
+        return Response({"is_member": is_member})
 
 
 class CategoryListViewSet(viewsets.ViewSet):
@@ -40,7 +82,7 @@ class ServerListViewSet(viewsets.ViewSet):
         - `category`: Filters servers by category name.
         - `qty`: Limits the number of servers returned.
         - `by_user`: Filters servers by user ID, only returning servers that the user is a member of.
-        - `by_server_id`: Filters servers by server ID.
+        - `by_serverid`: Filters servers by server ID.
         - `with_num_members`: Annotates each server with the number of members it has.
 
         Args: request: A Django Request object containing query parameters.
@@ -50,7 +92,7 @@ class ServerListViewSet(viewsets.ViewSet):
         category = request.query_params.get("category")
         qty = request.query_params.get("qty")
         by_user = request.query_params.get("by_user") == "true"
-        by_server_id = request.query_params.get("by_server_id")
+        by_serverid = request.query_params.get("by_serverid")
         with_num_members = request.query_params.get("with_num_members") == "true"
         
         if category:
@@ -66,15 +108,15 @@ class ServerListViewSet(viewsets.ViewSet):
         if with_num_members:
             self.queryset = self.queryset.annotate(num_members=Count("member"))
         
-        if by_server_id:
+        if by_serverid:
             if not request.user.is_authenticated:
                 raise AuthenticationFailed()
             
             try:
-                self.queryset = self.queryset.filter(id=by_server_id)
+                self.queryset = self.queryset.filter(id=by_serverid)
                 if not self.queryset.exists():
                     raise ValidationError(
-                        detail=f"Server with id {by_server_id} not found"
+                        detail=f"Server with id {by_serverid} not found"
                     )
             except ValueError as exc:
                 raise ValidationError(detail="Server value error") from exc
