@@ -40,6 +40,7 @@ const PrimaryDraw: React.FC<Props> = ({ children }) => {
   const Drawer = styled(
     MuiDrawer,
     {},
+    // @ts-ignore
   )(({ theme, open }) => ({
     width: theme.primaryDraw.width,
     whiteSpace: "nowrap",

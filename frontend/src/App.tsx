@@ -5,23 +5,23 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Home from "./pages/Home.tsx";
-import { ThemeProvider } from "@mui/material";
-import { createMuiTheme } from "./theme/Theme";
+import ToggleColorMode from "./components/ToggleColorMode";
+import Server from "./pages/Server";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/" element={<Home />} />
+      <Route path="/server" element={<Server />} />
     </Route>,
   ),
 );
 
 const App = () => {
-  const theme = createMuiTheme;
   return (
-    <ThemeProvider theme={theme}>
+    <ToggleColorMode>
       <RouterProvider router={router} />
-    </ThemeProvider>
+    </ToggleColorMode>
   );
 };
 

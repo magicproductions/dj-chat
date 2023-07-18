@@ -1,4 +1,5 @@
-import { createTheme, responsiveFontSizes } from "@mui/material";
+import { createTheme, PaletteMode, responsiveFontSizes } from "@mui/material";
+import { grey } from "@mui/material/colors";
 
 declare module "@mui/material/styles" {
   interface Theme {
@@ -28,7 +29,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-export const createMuiTheme = () => {
+export const createMuiTheme = (mode: PaletteMode) => {
   let theme = createTheme({
     typography: {
       fontFamily: ["IBM Plex Sans", "sans-serif"].join(","),
@@ -52,9 +53,30 @@ export const createMuiTheme = () => {
     secondaryDraw: {
       width: 240,
     },
-    // palette: {
-    //   mode,
-    // },
+    palette: {
+      mode,
+      ...(mode === "light"
+        ? {
+            primary: grey,
+            divider: grey[300],
+            text: {
+              primary: grey[900],
+              secondary: grey[800],
+            },
+          }
+        : {
+            primary: grey,
+            divider: grey[600],
+            background: {
+              default: grey[900],
+              paper: grey[900],
+            },
+            text: {
+              primary: "#fff",
+              secondary: grey[500],
+            },
+          }),
+    },
     components: {
       MuiAppBar: {
         defaultProps: {

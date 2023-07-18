@@ -19,12 +19,16 @@ const useCrud = <T>(initialData: T[], apiURL: string): IuseCrud<T> => {
     setIsLoading(true);
     try {
       const response = await jwtAxios.get(`${BASE_URL}${apiURL}`, {});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const data = response.data;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setDataCRUD(data);
       setError(null);
       setIsLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return data;
     } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.response && error.response.status === 400) {
         setError(new Error("400"));
       }
